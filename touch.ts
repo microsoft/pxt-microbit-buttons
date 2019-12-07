@@ -20,9 +20,13 @@ namespace touch {
     const CAPACITIVE_TOUCH_ID = 1200;
     const CAP_SAMPLES_2 = 3;
 
-    const MICROBIT_BUTTON_STATE_INITIALIZED = 0x0f
-    const MICROBIT_BUTTON_STATE_CALIBRATION_REQUIRED = 0x10
-    const MICROBIT_BUTTON_STATE_CALIBRATION_INPROGRESS = 0x20
+    const STATE = 1
+    const STATE_HOLD_TRIGGERED = 1 << 1
+    const STATE_CLICK = 1 << 2
+    const STATE_LONG_CLICK = 1 << 3
+    const STATE_INITIALIZED = 1 << 4
+    const STATE_CALIBRATION_REQUIRED = 1 << 5
+    const STATE_CALIBRATION_INPROGRESS = 1 << 6
 
     /**
      * A self capacitive button mounted on micro:bit pins.
@@ -61,25 +65,25 @@ namespace touch {
 
         private init() {
             if (!this.status) {
-                this.status |= MICROBIT_BUTTON_STATE_INITIALIZED;
+                this.status |= STATE_INITIALIZED;
                 control.inBackground(() => this.idleWorker());
             }
 
             // calibrate if needed
-            if (this.status & MICROBIT_BUTTON_STATE_CALIBRATION_REQUIRED) {
-                this.status &= ~MICROBIT_BUTTON_STATE_CALIBRATION_REQUIRED;
-                this.status |= MICROBIT_BUTTON_STATE_CALIBRATION_INPROGRESS;
+            if (this.status & STATE_CALIBRATION_REQUIRED) {
+                this.status &= ~STATE_CALIBRATION_REQUIRED;
+                this.status |= STATE_CALIBRATION_INPROGRESS;
                 const reading = this.read();
                 this.calibration = reading;
                 this.threshold = 3;
-                this.status &= ~MICROBIT_BUTTON_STATE_CALIBRATION_INPROGRESS;
+                this.status &= ~STATE_CALIBRATION_INPROGRESS;
             }
         }
 
         private idleWorker() {
             while (true) {
                 // don't interfere with calibration
-                if (!(this.status & MICROBIT_BUTTON_STATE_CALIBRATION_INPROGRESS))
+                if (!(this.status & STATE_CALIBRATION_INPROGRESS))
                     this.periodicCallback();
                 basic.pause(20)
             }
@@ -104,9 +108,9 @@ namespace touch {
 
             // Check to see if we have off->on state change.
             if (this.sigma > DAL.MICROBIT_BUTTON_SIGMA_THRESH_HI
-                && !(this.status & DAL.MICROBIT_BUTTON_STATE)) {
+                && !(this.status & STATE)) {
                 // Record we have a state change, and raise an event.
-                this.status |= DAL.MICROBIT_BUTTON_STATE;
+                this.status |= STATE;
                 control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_DOWN);
 
                 //Record the time the button was pressed.
@@ -115,8 +119,8 @@ namespace touch {
 
             // Check to see if we have on->off state change.
             if (this.sigma < DAL.MICROBIT_BUTTON_SIGMA_THRESH_LO
-                && (this.status & DAL.MICROBIT_BUTTON_STATE)) {
-                this.status &= ~DAL.MICROBIT_BUTTON_STATE;
+                && (this.status & STATE)) {
+                this.status &= ~STATE;
                 control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_UP);
 
                 //determine if this is a long click or a normal click and send event
@@ -127,11 +131,11 @@ namespace touch {
             }
 
             //if button is pressed and the hold triggered event state is not triggered AND we are greater than the button debounce value
-            if ((this.status & DAL.MICROBIT_BUTTON_STATE)
-                && !(this.status & DAL.MICROBIT_BUTTON_STATE_HOLD_TRIGGERED)
+            if ((this.status & STATE)
+                && !(this.status & STATE_HOLD_TRIGGERED)
                 && (input.runningTime() - this.downStartTime) >= DAL.MICROBIT_BUTTON_HOLD_TIME) {
                 //set the hold triggered event flag
-                this.status |= DAL.MICROBIT_BUTTON_STATE_HOLD_TRIGGERED;
+                this.status |= STATE_HOLD_TRIGGERED;
 
                 //fire hold event
                 control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_HOLD);
@@ -152,7 +156,7 @@ namespace touch {
          */
         //% blockId=touchcalibrate block="%button calibrate"
         calibrate() {
-            this.status |= MICROBIT_BUTTON_STATE_CALIBRATION_REQUIRED;
+            this.status |= STATE_CALIBRATION_REQUIRED;
             this.init();
         }
 
