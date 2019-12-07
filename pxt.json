@@ -4,14 +4,14 @@
         "CODE_OF_CONDUCT.md",
         "README.md",
         "SECURITY.md",
-        "main.blocks",
-        "main.ts"
+        "main.ts",
+        "touch.ts"
     ],
     "dependencies": {
         "core": "*",
         "radio": "*"
     },
-    "preferredEditor": "blocksprj",
+    "preferredEditor": "tsprj",
     "testFiles": [
         "test.ts"
     ]
