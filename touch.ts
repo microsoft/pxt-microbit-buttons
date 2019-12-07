@@ -12,13 +12,13 @@ const enum TouchButtonEvent {
     //% block="down"
     Down = 1 /* DAL.MICROBIT_BUTTON_EVT_DOWN */
 };
-
 /**
  * Capacitive button support in micro:bit
  */
 namespace touch {
     const CAPACITIVE_TOUCH_ID = 1200;
-    const CAP_SAMPLES_2 = 3;
+    const CAP_SAMPLES = 10;
+    const CALIBRATION_LINEAR_OFFSET = 1;
 
     const STATE = 1
     const STATE_HOLD_TRIGGERED = 1 << 1
@@ -35,7 +35,6 @@ namespace touch {
     export class CapacitiveButton {
         private id: number;
         private pin: AnalogInOutPin;
-        private calibration: number;
         private threshold: number;
         private lastReading: number;
         private status: number;
@@ -48,18 +47,17 @@ namespace touch {
             this.sigma = 0;
             this.status = 0;
             this.lastReading = -1;
-            this.calibration = -1;
         }
 
         private read() {
             let reading = 0;
-            const n = 1 << CAP_SAMPLES_2;
-            for (let i = 0; i < n; ++i) {
+            for (let i = 0; i < CAP_SAMPLES; ++i) {
                 reading += this.pin.analogRead()
                 this.pin.digitalWrite(true);
                 basic.pause(1);
             }
-            this.lastReading = reading >> CAP_SAMPLES_2;
+            this.lastReading = reading / CAP_SAMPLES;
+            this.pin.digitalWrite(false);
             return this.lastReading;
         }
 
@@ -73,9 +71,19 @@ namespace touch {
             if (this.status & STATE_CALIBRATION_REQUIRED) {
                 this.status &= ~STATE_CALIBRATION_REQUIRED;
                 this.status |= STATE_CALIBRATION_INPROGRESS;
-                const reading = this.read();
-                this.calibration = reading;
-                this.threshold = 3;
+
+                // Record the highest value measured. This is our baseline.
+                this.threshold = 0;
+                for (let i = 0; i < CAP_SAMPLES; ++i) {
+                    const reading = this.pin.analogRead()
+                    this.threshold = Math.max(this.threshold, reading);
+                    this.pin.digitalWrite(true);
+                    basic.pause(1);
+                }
+
+                // We've completed calibration, returnt to normal mode of operation.
+                this.threshold += CALIBRATION_LINEAR_OFFSET + 
+                    ((this.threshold * 5) / 100);
                 this.status &= ~STATE_CALIBRATION_INPROGRESS;
             }
         }
@@ -148,7 +156,7 @@ namespace touch {
         //% blockId=touchvalue block="%button value"
         value() {
             this.init();
-            return this.lastReading;
+            return this.lastReading | 0;
         }
 
         /**
@@ -170,7 +178,7 @@ namespace touch {
         }
 
         private isActive(): boolean {
-            return this.calibration + this.threshold < this.lastReading;
+            return this.threshold < this.lastReading;
         }
 
         /**
