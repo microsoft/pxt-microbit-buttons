@@ -178,7 +178,7 @@ namespace touch {
         }
 
         private isActive(): boolean {
-            return this.threshold < this.lastReading;
+            return this.threshold <= this.lastReading;
         }
 
         /**
