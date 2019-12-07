@@ -1,5 +1,5 @@
 {
-    "name": "pxt-microbit-buttons",
+    "name": "pxt-microbit-touch",
     "files": [
         "CODE_OF_CONDUCT.md",
         "README.md",
@@ -8,8 +8,7 @@
         "touch.ts"
     ],
     "dependencies": {
-        "core": "*",
-        "radio": "*"
+        "core": "*"
     },
     "preferredEditor": "tsprj",
     "testFiles": [
