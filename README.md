@@ -8,6 +8,10 @@
 
 ## Capacitive buttons (touch)
 
+## Acknowledgement
+
+Great [blog post](https://ukbaz.github.io/howto/microbit_touch.html) from Barry Byford.
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
