@@ -38,6 +38,10 @@ namespace input {
 
         value() {
             this.init();
+            return this.read();
+        }
+
+        private read() {
             let reading = 0;
             const n = 1 << CAP_SAMPLES_2;
             for (let i = 0; i < n; ++i) {
@@ -50,7 +54,7 @@ namespace input {
         }
 
         calibrate() {
-            this.calibration = this.value();
+            this.calibration = this.read();
             this.threshold = 3;
         }
 
