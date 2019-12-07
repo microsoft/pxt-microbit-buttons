@@ -10,7 +10,9 @@
 
 ## Acknowledgement
 
-Great [blog post](https://ukbaz.github.io/howto/microbit_touch.html) from Barry Byford.
+Various resources exist on the subject of capacitive touch and micro:bit:
+* [blog post](https://ukbaz.github.io/howto/microbit_touch.html) from Barry Byford.
+* [tutorial](https://www.bareconductive.com/make/create-a-touch-sensor-for-microbit-with-electric-paint/) from bare conductive.
 
 ## Contributing
 
