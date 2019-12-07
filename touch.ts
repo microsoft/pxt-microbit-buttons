@@ -10,8 +10,11 @@ const enum TouchButtonEvent {
     //% block="up"
     Up = 2 /* DAL.MICROBIT_BUTTON_EVT_UP */,
     //% block="down"
-    Down = 1 /* DAL.MICROBIT_BUTTON_EVT_DOWN */
+    Down = 1, /* DAL.MICROBIT_BUTTON_EVT_DOWN */
+    //% block="down"
+    Hold = 5 /* DAL.MICROBIT_BUTTON_EVT_HOLD */
 };
+
 /**
  * Capacitive button support in micro:bit
  */
