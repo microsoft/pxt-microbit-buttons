@@ -1,10 +1,12 @@
-# Micro:bit touch
+# Micro:bit buttons
 
 ## Using this extension
 
 * go to https://makecode.microbit.org 
 * create a new program or open existing
-* go to **Advanced**, **Extensions** and search for https://github.com/microsoft/pxt-microbit-touch
+* go to **Advanced**, **Extensions** and search for https://github.com/microsoft/pxt-microbit-buttons
+
+## Capacitive buttons (touch)
 
 ## Contributing
 
