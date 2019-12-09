@@ -1,4 +1,5 @@
 // tests go here; this will not be compiled when this package is used as an extension.
+led.plot(2,0)
 basic.forever(function () {
     input.touchP0.log();
     if (input.touchP0.isTouched()) {
@@ -14,3 +15,20 @@ basic.forever(function () {
         led.unplot(4, 0)
     }
 })
+
+input.touchP0.onEvent(TouchButtonEvent.Down, function () {
+    led.plot(0, 1)
+})
+input.touchP0.onEvent(TouchButtonEvent.Up, function () {
+    led.plot(1, 1)
+})
+/*
+input.touchP0.onEvent(TouchButtonEvent.Click, function () {
+    led.plot(2, 1)
+})
+input.touchP0.onEvent(TouchButtonEvent.LongClick, function () {
+    led.plot(3, 1)
+})
+input.touchP0.onEvent(TouchButtonEvent.Hold, function () {
+    led.plot(4, 1)
+})*/

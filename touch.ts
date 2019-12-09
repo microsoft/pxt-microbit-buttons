@@ -70,7 +70,7 @@ namespace input {
 
         private init() {
             if (!this.status) {
-                this.status |= STATE_INITIALIZED;
+                this.status |= STATE_INITIALIZED | STATE_CALIBRATION_REQUIRED;
                 control.inBackground(() => this.idleWorker());
             }
 
@@ -98,7 +98,7 @@ namespace input {
         private idleWorker() {
             while (true) {
                 // don't interfere with calibration
-                if (!(this.status & STATE_CALIBRATION_INPROGRESS))
+                if (!(this.status & (STATE_CALIBRATION_INPROGRESS | STATE_CALIBRATION_REQUIRED)))
                     this.periodicCallback();
                 basic.pause(20)
             }
