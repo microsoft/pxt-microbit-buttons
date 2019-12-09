@@ -60,10 +60,6 @@ namespace input {
             this.downStartTime = 0;
         }
 
-        public log() {
-            console.log(`${this.status} ${this.threshold} ${this.lastReading}`)
-        }
-
         private read() {
             let reading = 0;
             for (let i = 0; i < CAP_SAMPLES; ++i) {
