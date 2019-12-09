@@ -22,6 +22,10 @@ namespace input {
     const CAPACITIVE_TOUCH_ID = 60;
     const CAP_SAMPLES = 10;
     const CALIBRATION_LINEAR_OFFSET = 1;
+    const SIGMA_THRESH_MAX = 4;
+    const SIGMA_THRESH_HI = 3;
+    const SIGMA_THRESH_LO = 1;
+    const SIGMA_THRESH_MIN = 0;
 
     const STATE = 1
     const STATE_HOLD_TRIGGERED = 1 << 1
@@ -113,16 +117,16 @@ namespace input {
             //
             this.read();
             if (this.isActive()) {
-                if (this.sigma < DAL.MICROBIT_BUTTON_SIGMA_MAX)
+                if (this.sigma < SIGMA_THRESH_MAX)
                     this.sigma++;
             }
             else {
-                if (this.sigma > DAL.MICROBIT_BUTTON_SIGMA_MIN)
+                if (this.sigma > SIGMA_THRESH_MIN)
                     this.sigma--;
             }
 
             // Check to see if we have off->on state change.
-            if (this.sigma > DAL.MICROBIT_BUTTON_SIGMA_THRESH_HI
+            if (this.sigma > SIGMA_THRESH_HI
                 && !(this.status & STATE)) {
                 // Record we have a state change, and raise an event.
                 this.status |= STATE;
@@ -133,7 +137,7 @@ namespace input {
             }
 
             // Check to see if we have on->off state change.
-            if (this.sigma < DAL.MICROBIT_BUTTON_SIGMA_THRESH_LO
+            if (this.sigma < SIGMA_THRESH_HI
                 && (this.status & STATE)) {
                 this.status &= ~STATE;
                 control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_UP);

@@ -16,10 +16,16 @@ basic.forever(function () {
     }
 })
 
+function clearEvents() {
+    for (let i = 0; i < 5; ++i)
+        led.unplot(i, 1)
+}
 input.touchP0.onEvent(TouchButtonEvent.Down, function () {
+    clearEvents();
     led.plot(0, 1)
 })
 input.touchP0.onEvent(TouchButtonEvent.Up, function () {
+    clearEvents();
     led.plot(1, 1)
 })
 /*
