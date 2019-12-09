@@ -18,7 +18,7 @@ const enum TouchButtonEvent {
 /**
  * Capacitive button support in micro:bit
  */
-namespace touch {
+namespace input {
     const CAPACITIVE_TOUCH_ID = 60;
     const CAP_SAMPLES = 10;
     const CALIBRATION_LINEAR_OFFSET = 1;
@@ -175,6 +175,7 @@ namespace touch {
          * Determines if the button is being pressed
          */
         //% blockId=touchistouched block="is %button touched"
+        //% group="Touch"
         isTouched(): boolean {
             this.init();
             return this.isActive();
@@ -188,6 +189,7 @@ namespace touch {
          * Registers an button event
          */
         //% blockId=touchonevent block="on %button $event"
+        //% group="Touch"
         onEvent(event: TouchButtonEvent, handler: () => void) {
             this.init();
             control.onEvent(this.id, event, handler);
@@ -195,9 +197,12 @@ namespace touch {
     }
 
     //% fixedInstance block="P0"
-    export const pinP0 = new CapacitiveButton(CAPACITIVE_TOUCH_ID + DAL.MICROBIT_ID_IO_P0, pins.P0);
+    //% group="Touch"
+    export const touchP0 = new CapacitiveButton(CAPACITIVE_TOUCH_ID + DAL.MICROBIT_ID_IO_P0, pins.P0);
     //% fixedInstance block="P1"
-    export const pinP1 = new CapacitiveButton(CAPACITIVE_TOUCH_ID + DAL.MICROBIT_ID_IO_P1, pins.P1);
+    //% group="Touch"
+    export const touchP1 = new CapacitiveButton(CAPACITIVE_TOUCH_ID + DAL.MICROBIT_ID_IO_P1, pins.P1);
     //% fixedInstance block="P2"
-    export const pinP2 = new CapacitiveButton(CAPACITIVE_TOUCH_ID + DAL.MICROBIT_ID_IO_P2, pins.P2);
+    //% group="Touch"
+    export const touchP2 = new CapacitiveButton(CAPACITIVE_TOUCH_ID + DAL.MICROBIT_ID_IO_P2, pins.P2);
 }
