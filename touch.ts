@@ -52,6 +52,10 @@ namespace input {
             this.lastReading = -1;
         }
 
+        public log() {
+            console.log(`${this.id} ${this.status} ${this.threshold} ${this.lastReading}`)
+        }
+
         private read() {
             let reading = 0;
             for (let i = 0; i < CAP_SAMPLES; ++i) {
