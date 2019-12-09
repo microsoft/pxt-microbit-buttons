@@ -55,10 +55,11 @@ namespace input {
             this.sigma = 0;
             this.status = 0;
             this.lastReading = -1;
+            this.downStartTime = 0;
         }
 
         public log() {
-            console.log(`${this.threshold} ${this.lastReading}`)
+            console.log(`${this.status} ${this.threshold} ${this.lastReading}`)
         }
 
         private read() {
@@ -136,23 +137,25 @@ namespace input {
 
                 //Record the time the button was pressed.
                 this.downStartTime = input.runningTime();
+                console.log('b')
             }
 
             // Check to see if we have on->off state change.
-            if (this.sigma < SIGMA_THRESH_LO
+            else if (this.sigma < SIGMA_THRESH_LO
                 && (this.status & STATE)) {
                 this.status &= ~STATE;
                 control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_UP);
 
                 //determine if this is a long click or a normal click and send event
-                if ((input.runningTime() - this.downStartTime) >= DAL.MICROBIT_BUTTON_LONG_CLICK_TIME)
+                const elapsed = input.runningTime() - this.downStartTime;
+                if (elapsed >= DAL.MICROBIT_BUTTON_LONG_CLICK_TIME)
                     control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_LONG_CLICK);
                 else
                     control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_CLICK);
             }
 
             //if button is pressed and the hold triggered event state is not triggered AND we are greater than the button debounce value
-            if ((this.status & STATE)
+            else if ((this.status & STATE)
                 && !(this.status & STATE_HOLD_TRIGGERED)
                 && (input.runningTime() - this.downStartTime) >= DAL.MICROBIT_BUTTON_HOLD_TIME) {
                 //set the hold triggered event flag

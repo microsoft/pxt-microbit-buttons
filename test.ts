@@ -29,10 +29,11 @@ input.touchP0.onEvent(TouchButtonEvent.Up, function () {
     clearEvents();
     led.plot(1, 1)
 })
-/*
-input.touchP0.onEvent(TouchButtonEvent.Click, function () {
+/*input.touchP0.onEvent(TouchButtonEvent.Click, function () {
+    clearEvents();
     led.plot(2, 1)
-})
+})*/
+/*
 input.touchP0.onEvent(TouchButtonEvent.LongClick, function () {
     led.plot(3, 1)
 })
