@@ -21,6 +21,7 @@ const enum TouchButtonEvent {
 namespace input {
     const CAPACITIVE_TOUCH_ID = 60;
     const CAP_SAMPLES = 10;
+    const CALIBRATION_CONSTANT_OFFSET = 1;
     const CALIBRATION_LINEAR_OFFSET = 1;
     const SIGMA_THRESH_MAX = 4;
     const SIGMA_THRESH_HI = 3;
@@ -57,7 +58,7 @@ namespace input {
         }
 
         public log() {
-            console.log(`${this.id} ${this.status} ${this.threshold} ${this.lastReading}`)
+            console.log(`${this.threshold} ${this.lastReading}`)
         }
 
         private read() {
@@ -93,8 +94,9 @@ namespace input {
                 }
 
                 // We've completed calibration, returnt to normal mode of operation.
-                this.threshold += CALIBRATION_LINEAR_OFFSET + 
-                    ((this.threshold * 5) / 100);
+                this.threshold += CALIBRATION_CONSTANT_OFFSET + 
+                    ((this.threshold * CALIBRATION_LINEAR_OFFSET) / 100);
+                this.threshold |= 0;
                 this.status &= ~STATE_CALIBRATION_INPROGRESS;
             }
         }
@@ -137,7 +139,7 @@ namespace input {
             }
 
             // Check to see if we have on->off state change.
-            if (this.sigma < SIGMA_THRESH_HI
+            if (this.sigma < SIGMA_THRESH_LO
                 && (this.status & STATE)) {
                 this.status &= ~STATE;
                 control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_UP);
