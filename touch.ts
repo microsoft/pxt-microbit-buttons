@@ -19,14 +19,15 @@ const enum TouchButtonEvent {
  * Capacitive button support in micro:bit
  */
 namespace input {
-    const CAPACITIVE_TOUCH_ID = 60;
+    const CAPACITIVE_TOUCH_ID = 6543;
     const CAP_SAMPLES = 10;
     const CALIBRATION_CONSTANT_OFFSET = 1;
     const CALIBRATION_LINEAR_OFFSET = 1;
-    const SIGMA_THRESH_MAX = 4;
-    const SIGMA_THRESH_HI = 3;
+    const SIGMA_THRESH_MAX = 3;
+    const SIGMA_THRESH_HI = 2;
     const SIGMA_THRESH_LO = 1;
     const SIGMA_THRESH_MIN = 0;
+    const BUTTON_HOLD_TIME = 1500;
 
     const STATE = 1
     const STATE_HOLD_TRIGGERED = 1 << 1
@@ -52,6 +53,7 @@ namespace input {
         constructor(id: number, pin: AnalogInOutPin) {
             this.id = id;
             this.pin = pin;
+            this.threshold = 1023;
             this.sigma = 0;
             this.status = 0;
             this.lastReading = -1;
@@ -82,9 +84,9 @@ namespace input {
 
             // calibrate if needed
             if (this.status & STATE_CALIBRATION_REQUIRED) {
+                console.log(`calibrate`)
                 this.status &= ~STATE_CALIBRATION_REQUIRED;
                 this.status |= STATE_CALIBRATION_INPROGRESS;
-
                 // Record the highest value measured. This is our baseline.
                 this.threshold = 0;
                 for (let i = 0; i < CAP_SAMPLES; ++i) {
@@ -96,13 +98,13 @@ namespace input {
 
                 // We've completed calibration, returnt to normal mode of operation.
                 this.threshold += CALIBRATION_CONSTANT_OFFSET + 
-                    ((this.threshold * CALIBRATION_LINEAR_OFFSET) / 100);
-                this.threshold |= 0;
+                    (this.threshold * CALIBRATION_LINEAR_OFFSET) / 100;
                 this.status &= ~STATE_CALIBRATION_INPROGRESS;
             }
         }
 
         private idleWorker() {
+            console.log(`idle`)            
             while (true) {
                 // don't interfere with calibration
                 if (!(this.status & (STATE_CALIBRATION_INPROGRESS | STATE_CALIBRATION_REQUIRED)))
@@ -129,40 +131,39 @@ namespace input {
             }
 
             // Check to see if we have off->on state change.
-            if (this.sigma > SIGMA_THRESH_HI
+            if (this.sigma >= SIGMA_THRESH_HI
                 && !(this.status & STATE)) {
+                console.log('down')
                 // Record we have a state change, and raise an event.
                 this.status |= STATE;
-                control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_DOWN);
+                control.raiseEvent(this.id, TouchButtonEvent.Down);
 
                 //Record the time the button was pressed.
                 this.downStartTime = input.runningTime();
-                console.log('b')
             }
-
             // Check to see if we have on->off state change.
-            else if (this.sigma < SIGMA_THRESH_LO
+            else if (this.sigma <= SIGMA_THRESH_LO
                 && (this.status & STATE)) {
+                console.log('up')
                 this.status &= ~STATE;
-                control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_UP);
+                control.raiseEvent(this.id, TouchButtonEvent.Up);
 
                 //determine if this is a long click or a normal click and send event
                 const elapsed = input.runningTime() - this.downStartTime;
                 if (elapsed >= DAL.MICROBIT_BUTTON_LONG_CLICK_TIME)
-                    control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_LONG_CLICK);
+                    control.raiseEvent(this.id, TouchButtonEvent.LongClick);
                 else
-                    control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_CLICK);
+                    control.raiseEvent(this.id, TouchButtonEvent.Click);
             }
-
             //if button is pressed and the hold triggered event state is not triggered AND we are greater than the button debounce value
             else if ((this.status & STATE)
                 && !(this.status & STATE_HOLD_TRIGGERED)
-                && (input.runningTime() - this.downStartTime) >= DAL.MICROBIT_BUTTON_HOLD_TIME) {
+                && (input.runningTime() - this.downStartTime) >= BUTTON_HOLD_TIME) {
+                console.log('hold')
                 //set the hold triggered event flag
                 this.status |= STATE_HOLD_TRIGGERED;
-
                 //fire hold event
-                control.raiseEvent(this.id, DAL.MICROBIT_BUTTON_EVT_HOLD);
+                control.raiseEvent(this.id, TouchButtonEvent.Hold);
             }
         }
 
