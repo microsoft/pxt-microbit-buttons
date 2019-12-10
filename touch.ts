@@ -67,7 +67,7 @@ namespace input {
                 this.pin.digitalWrite(true);
                 basic.pause(1);
             }
-            this.lastReading = reading / CAP_SAMPLES;
+            this.lastReading = Math.idiv(reading, CAP_SAMPLES);
             this.pin.digitalWrite(false);
             return this.lastReading;
         }
@@ -80,7 +80,6 @@ namespace input {
 
             // calibrate if needed
             if (this.status & STATE_CALIBRATION_REQUIRED) {
-                console.log(`calibrate`)
                 this.status &= ~STATE_CALIBRATION_REQUIRED;
                 this.status |= STATE_CALIBRATION_INPROGRESS;
                 // Record the highest value measured. This is our baseline.
@@ -94,13 +93,12 @@ namespace input {
 
                 // We've completed calibration, returnt to normal mode of operation.
                 this.threshold += CALIBRATION_CONSTANT_OFFSET + 
-                    (this.threshold * CALIBRATION_LINEAR_OFFSET) / 100;
+                    Math.idiv(this.threshold * CALIBRATION_LINEAR_OFFSET, 100);
                 this.status &= ~STATE_CALIBRATION_INPROGRESS;
             }
         }
 
         private idleWorker() {
-            console.log(`idle`)            
             while (true) {
                 // don't interfere with calibration
                 if (!(this.status & (STATE_CALIBRATION_INPROGRESS | STATE_CALIBRATION_REQUIRED)))
@@ -129,7 +127,6 @@ namespace input {
             // Check to see if we have off->on state change.
             if (this.sigma >= SIGMA_THRESH_HI
                 && !(this.status & STATE)) {
-                console.log('down')
                 // Record we have a state change, and raise an event.
                 this.status |= STATE;
                 control.raiseEvent(this.id, TouchButtonEvent.Down);
@@ -140,7 +137,6 @@ namespace input {
             // Check to see if we have on->off state change.
             else if (this.sigma <= SIGMA_THRESH_LO
                 && (this.status & STATE)) {
-                console.log('up')
                 this.status &= ~STATE;
                 control.raiseEvent(this.id, TouchButtonEvent.Up);
 
@@ -155,7 +151,6 @@ namespace input {
             else if ((this.status & STATE)
                 && !(this.status & STATE_HOLD_TRIGGERED)
                 && (input.runningTime() - this.downStartTime) >= BUTTON_HOLD_TIME) {
-                console.log('hold')
                 //set the hold triggered event flag
                 this.status |= STATE_HOLD_TRIGGERED;
                 //fire hold event
