@@ -6,12 +6,11 @@ basic.forever(function () {
     } else {
         led.unplot(0, 0)
     }
-    /*
     if (input.touchP2.isTouched()) {
         led.plot(4, 0)
     } else {
         led.unplot(4, 0)
-    }*/
+    }
 })
 input.touchP0.onEvent(TouchButtonEvent.Down, function () {
     for (let i = 0; i < 5; ++i)
