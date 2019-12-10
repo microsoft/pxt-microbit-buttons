@@ -31,8 +31,8 @@ namespace input {
 
     const STATE = 1
     const STATE_HOLD_TRIGGERED = 1 << 1
-    const STATE_CLICK = 1 << 2
-    const STATE_LONG_CLICK = 1 << 3
+    //const STATE_CLICK = 1 << 2
+    //const STATE_LONG_CLICK = 1 << 3
     const STATE_INITIALIZED = 1 << 4
     const STATE_CALIBRATION_REQUIRED = 1 << 5
     const STATE_CALIBRATION_INPROGRESS = 1 << 6
