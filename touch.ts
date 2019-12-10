@@ -20,7 +20,7 @@ const enum TouchButtonEvent {
  */
 namespace input {
     const CAPACITIVE_TOUCH_ID = 6543;
-    const CAP_SAMPLES = 10;
+    const CAP_SAMPLES = 6;
     const CALIBRATION_CONSTANT_OFFSET = 1;
     const CALIBRATION_LINEAR_OFFSET = 1;
     const SIGMA_THRESH_MAX = 3;
