@@ -20,9 +20,9 @@ const enum TouchButtonEvent {
  */
 namespace input {
     const CAPACITIVE_TOUCH_ID = 6543;
+    const CALIBRATION_SAMPLES = 10;
     const CAP_SAMPLES = 6;
     const CALIBRATION_CONSTANT_OFFSET = 1;
-    const CALIBRATION_LINEAR_OFFSET = 1;
     const SIGMA_THRESH_MAX = 3;
     const SIGMA_THRESH_HI = 2;
     const SIGMA_THRESH_LO = 1;
@@ -44,7 +44,7 @@ namespace input {
     export class CapacitiveButton {
         private id: number;
         private pin: AnalogInOutPin;
-        private threshold: number;
+        public threshold: number;
         private lastReading: number;
         private status: number;
         private sigma: number;
@@ -63,9 +63,9 @@ namespace input {
         private read() {
             let reading = 0;
             for (let i = 0; i < CAP_SAMPLES; ++i) {
-                reading += this.pin.analogRead()
                 this.pin.digitalWrite(true);
                 basic.pause(1);
+                reading += this.pin.analogRead()
             }
             this.lastReading = Math.idiv(reading, CAP_SAMPLES);
             this.pin.digitalWrite(false);
@@ -84,16 +84,15 @@ namespace input {
                 this.status |= STATE_CALIBRATION_INPROGRESS;
                 // Record the highest value measured. This is our baseline.
                 this.threshold = 0;
-                for (let i = 0; i < CAP_SAMPLES; ++i) {
+                for (let i = 0; i < CALIBRATION_SAMPLES; ++i) {
+                    basic.pause(1);
+                    this.pin.digitalWrite(true);
                     const reading = this.pin.analogRead()
                     this.threshold = Math.max(this.threshold, reading);
-                    this.pin.digitalWrite(true);
-                    basic.pause(1);
                 }
 
                 // We've completed calibration, returnt to normal mode of operation.
-                this.threshold += CALIBRATION_CONSTANT_OFFSET + 
-                    Math.idiv(this.threshold * CALIBRATION_LINEAR_OFFSET, 100);
+                this.threshold += CALIBRATION_CONSTANT_OFFSET;
                 this.status &= ~STATE_CALIBRATION_INPROGRESS;
             }
         }

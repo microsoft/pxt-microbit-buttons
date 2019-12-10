@@ -8,6 +8,17 @@
 
 ## Capacitive buttons (touch)
 
+### Click events (and others)
+
+The button emits ``down``, ``up``, ``click``, ``long lick``
+and ``hold`` events.
+
+```blocks
+input.touchP0.onEvent(TouchButtonEvent.Click, function () {
+    led.plot(2, 1)
+})
+```
+
 ## Acknowledgement
 
 Various resources exist on the subject of capacitive touch and micro:bit:
