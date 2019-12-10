@@ -19,6 +19,20 @@ input.touchP0.onEvent(TouchButtonEvent.Click, function () {
 })
 ```
 
+### Polling state
+
+Use ``isTouched`` or ``value`` to query the state of the sensor.
+
+```blocks
+basic.forever(function () {
+    if (input.touchP0.isTouched()) {
+        led.plot(0, 0)
+    } else {
+        led.unplot(0, 0)
+    }
+})
+```
+
 ## Acknowledgement
 
 Various resources exist on the subject of capacitive touch and micro:bit:
