@@ -20,12 +20,12 @@ const enum TouchButtonEvent {
  */
 namespace input {
     const CAPACITIVE_TOUCH_ID = 6543;
-    const CALIBRATION_SAMPLES = 10;
-    const CAP_SAMPLES = 6;
-    const CALIBRATION_CONSTANT_OFFSET = 1;
-    const SIGMA_THRESH_MAX = 3;
-    const SIGMA_THRESH_HI = 2;
-    const SIGMA_THRESH_LO = 1;
+    const CALIBRATION_SAMPLES = 8;
+    const CAP_SAMPLES = 4;
+    const CALIBRATION_CONSTANT_OFFSET = 4;
+    const SIGMA_THRESH_MAX = 5;
+    const SIGMA_THRESH_HI = 4;
+    const SIGMA_THRESH_LO = 2;
     const SIGMA_THRESH_MIN = 0;
     const BUTTON_HOLD_TIME = 1500;
 
@@ -64,7 +64,7 @@ namespace input {
             let reading = 0;
             for (let i = 0; i < CAP_SAMPLES; ++i) {
                 this.pin.digitalWrite(true);
-                basic.pause(1);
+                control.waitMicros(5)
                 reading += this.pin.analogRead()
             }
             this.lastReading = Math.idiv(reading, CAP_SAMPLES);
@@ -86,8 +86,7 @@ namespace input {
                 this.threshold = 0;
                 for (let i = 0; i < CALIBRATION_SAMPLES; ++i) {
                     basic.pause(1);
-                    this.pin.digitalWrite(true);
-                    const reading = this.pin.analogRead()
+                    const reading = this.read();
                     this.threshold = Math.max(this.threshold, reading);
                 }
 
