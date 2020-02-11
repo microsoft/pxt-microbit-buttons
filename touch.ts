@@ -50,6 +50,19 @@ namespace input {
         private sigma: number;
         private downStartTime: number;
 
+        private static _buttons: CapacitiveButton[];
+        private static idleWorker() {
+            while (true) {
+                for (const b of CapacitiveButton._buttons) {
+                    // don't interfere with calibration
+                    if (!(b.status & (STATE_CALIBRATION_INPROGRESS | STATE_CALIBRATION_REQUIRED)))
+                        b.periodicCallback();
+                    basic.pause(20)
+                }
+            }
+        }
+
+
         constructor(id: number, pin: AnalogInOutPin) {
             this.id = id;
             this.pin = pin;
@@ -58,6 +71,12 @@ namespace input {
             this.status = 0;
             this.lastReading = -1;
             this.downStartTime = 0;
+
+            if (!CapacitiveButton._buttons) {
+                CapacitiveButton._buttons = [];
+                control.inBackground(() => CapacitiveButton.idleWorker());
+            }
+            CapacitiveButton._buttons.push(this);
         }
 
         private read() {
@@ -75,7 +94,6 @@ namespace input {
         private init() {
             if (!this.status) {
                 this.status |= STATE_INITIALIZED | STATE_CALIBRATION_REQUIRED;
-                control.inBackground(() => this.idleWorker());
             }
 
             // calibrate if needed
@@ -93,15 +111,6 @@ namespace input {
                 // We've completed calibration, returnt to normal mode of operation.
                 this.threshold += CALIBRATION_CONSTANT_OFFSET;
                 this.status &= ~STATE_CALIBRATION_INPROGRESS;
-            }
-        }
-
-        private idleWorker() {
-            while (true) {
-                // don't interfere with calibration
-                if (!(this.status & (STATE_CALIBRATION_INPROGRESS | STATE_CALIBRATION_REQUIRED)))
-                    this.periodicCallback();
-                basic.pause(20)
             }
         }
 

@@ -32,7 +32,9 @@ function bind(pin: input.CapacitiveButton, row: number) {
     })
 }
 
-bind(input.touchP1, 1)
+bind(input.touchP0, 1)
+bind(input.touchP1, 2)
+
 
 
 
