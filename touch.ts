@@ -11,7 +11,7 @@ const enum TouchButtonEvent {
     Up = 2 /* DAL.MICROBIT_BUTTON_EVT_UP */,
     //% block="down"
     Down = 1, /* DAL.MICROBIT_BUTTON_EVT_DOWN */
-    //% block="down"
+    //% block="hold"
     Hold = 5 /* DAL.MICROBIT_BUTTON_EVT_HOLD */
 };
 
